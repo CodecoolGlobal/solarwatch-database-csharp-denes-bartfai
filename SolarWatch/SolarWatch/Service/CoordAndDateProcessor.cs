@@ -5,23 +5,24 @@ namespace SolarWatch.Service;
 
 public class CoordAndDateProcessor : ICoordAndDateProcessor
 {
-    public string GetSunriseTime(float lat, float lon, string date)
+    public async Task<string> GetSunriseTime(double lat, double lon, string date)
     {
-        return GetSunRiseSetTime(lat, lon, date).Item1;
+        var (sunrise, _) = await GetSunriseSetTime(lat, lon, date);
+        return sunrise;
     }
 
-    public string GetSunsetTime(float lat, float lon, string date)
+    public async Task<string> GetSunsetTime(double lat, double lon, string date)
     {
-        return GetSunRiseSetTime(lat, lon, date).Item2;
+        var (_, sunset) = await GetSunriseSetTime(lat, lon, date);
+        return sunset;
     }
     
-    private (string, string) GetSunRiseSetTime(float lat, float lon, string date)
+    private async Task<(string, string)> GetSunriseSetTime(double lat, double lon, string date)
     {
         var url = $"https://api.sunrise-sunset.org/json?lat={lat}&lng={lon}&date={date}";
         using (var client = new HttpClient())
         {
-            var response = client.GetAsync(url).Result;
-            var responseJson = response.Content.ReadAsStringAsync().Result;
+            var responseJson = await client.GetStringAsync(url);
 
             if (responseJson is null) 
             {

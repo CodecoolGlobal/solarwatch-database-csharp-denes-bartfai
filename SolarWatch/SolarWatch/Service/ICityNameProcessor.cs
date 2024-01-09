@@ -2,6 +2,8 @@
 
 public interface ICityNameProcessor
 {
-    public float GetLonCoord(string cityName);
-    public float GetLatCoord(string cityName);
+    public Task<double> GetLatCoord(string cityName);
+    public Task<double> GetLonCoord(string cityName);
+    public Task<string> GetCountry(string cityName);
+    public Task<string> GetState(string cityName);
 }

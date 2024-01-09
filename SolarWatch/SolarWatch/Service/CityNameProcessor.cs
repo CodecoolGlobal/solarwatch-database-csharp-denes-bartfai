@@ -6,23 +6,38 @@ namespace SolarWatch.Service;
 
 public class CityNameProcessor : ICityNameProcessor
 {
-    public float GetLonCoord(string cityName)
+    
+    public async Task<double> GetLatCoord(string cityName)
     {
-        return GetCoords(cityName).Item1;
+        var (lat, _, _, _) = await GetInfo(cityName);
+        return lat;
+    }
+    public async Task<double> GetLonCoord(string cityName)
+    {
+        var (_, lon, _, _) = await GetInfo(cityName);
+        return lon;
     }
 
-    public float GetLatCoord(string cityName)
+    public async Task<string> GetState(string cityName)
     {
-        return GetCoords(cityName).Item2;
+        var (_, _, state, _) = await GetInfo(cityName);
+        return state;
     }
+    
+    public async Task<string> GetCountry(string cityName)
+    {
+        var (_, _, _, country) = await GetInfo(cityName);
+        return country;
+    }
+    
 
-    private (float, float) GetCoords(string cityName)
+    private async Task<(double, double, string?, string?)> GetInfo(string cityName)
     {
         var apiKey = "c047c04a6fd12ce4ec1c75b11ffe85ec";
         var url = $"http://api.openweathermap.org/geo/1.0/direct?q={cityName}&limit=1&appid={apiKey}";
-        using(var client = new WebClient())
+        using(var client = new HttpClient())
         {
-            var responseJson = client.DownloadString(url);
+            var responseJson = await client.GetStringAsync(url);
 
             var locations = JsonConvert.DeserializeObject<Location[]>(responseJson);
 
@@ -30,12 +45,14 @@ public class CityNameProcessor : ICityNameProcessor
             {
                 var lat = locations[0].lat;
                 var lon = locations[0].lon;
+                var state = locations[0].state;
+                var country = locations[0].country;
 
-                return (lat, lon);
+                return (lat, lon, state, country);
             }
             else
             {
-                return (0, 0);
+                return (0, 0, null, null);
             }
         }
     }
@@ -43,6 +60,8 @@ public class CityNameProcessor : ICityNameProcessor
 
 public class Location
 {
-    public float lat { get; set; }
-    public float lon { get; set; }
+    public double lat { get; set; }
+    public double lon { get; set; }
+    public string? state { get; set; }
+    public string country { get; set; }
 }
