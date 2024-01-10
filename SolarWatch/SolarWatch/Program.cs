@@ -1,3 +1,4 @@
+using SolarWatch.Model.Repository;
 using SolarWatch.Service;
 
 
@@ -11,6 +12,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<ICityNameProcessor, CityNameProcessor>();
 builder.Services.AddSingleton<ICoordAndDateProcessor, CoordAndDateProcessor>();
+builder.Services.AddSingleton<ICityRepository, CityRepository>();
+builder.Services.AddSingleton<ISunTimesRepository, SunTimesRepository>();
 
 
 var app = builder.Build();
